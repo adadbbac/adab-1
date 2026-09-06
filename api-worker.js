@@ -368,7 +368,7 @@ export default {
   async fetch(request, env){
     const url=new URL(request.url);
     if(url.pathname.startsWith('/api/')){
-      try{return await api(env,request,url);}catch(e){console.error(e);return json({ok:false,error:'حدث خطأ داخلي',detail:env.ENVIRONMENT==='development'?String(e):undefined},500);}
+     try{return await api(env,request,url);}catch(e){console.error(e);return json({ok:false,error:'حدث خطأ داخلي',detail:String(e)},500);}
     }
     const cm=url.pathname.match(/^\/content\/([^/]+)$/);
     if(cm){
