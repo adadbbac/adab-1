@@ -10,7 +10,31 @@ function adabIdFromFile(cat,file){return cat+'-'+file.replace(/^[^-]+-/,'').repl
 function adabAllowed(cat,u){if(!u||u.status==='suspended')return false;if(cat==='lessons')return true;if(cat==='research')return u.status==='active'||u.status==='verified';if(cat==='training')return u.status==='verified';return false}
 function adabGate(cat){const u=adabStatus();if(!u){return `<div class="access-gate"><div>🔒</div><h2>هذا المحتوى داخل فضاء التلميذ</h2><p>سجّل الدخول إلى فضائك للوصول إلى المحتوى التعليمي.</p><a class="primary-btn" href="student__index.html">فضاء التلميذ</a></div>`}if(!adabAllowed(cat,u)){return `<div class="access-gate"><div>🧭</div><h2>المحتوى غير متاح لحالة حسابك</h2><p>ستتوسع صلاحياتك بعد توثيق الحساب من طرف الأستاذ.</p><a class="primary-btn" href="student__index.html">العودة إلى فضائك</a></div>`}return null}
 function adabInitAccess(){const path=location.pathname.replace(/\\/g,'/');const file=path.split('/').pop();const cat=file.startsWith('lessons__')?'lessons':file.startsWith('training__')?'training':file.startsWith('research__')?'research':null;if(!cat)return;const u=adabStatus();const allowed=adabAllowed(cat,u);const pub=adabPub();const originalFile=file.replace(/^(lessons__|training__|research__)/,'');const isDetail=/^(lesson|training|research)-\d+-\d+\.html$/.test(originalFile);const key=isDetail?adabIdFromFile(cat,originalFile):null;if(isDetail && (!allowed || (pub && pub[key]===false))){const main=document.querySelector('main');if(main){main.innerHTML=adabGate(cat)||`<div class="access-gate"><div>⏳</div><h2>هذا المورد غير منشور بعد</h2><p>سيظهر هنا عندما ينشره الأستاذ.</p><a class="primary-btn" href="${cat}/index.html">العودة إلى ${cat==='lessons'?'الدروس':cat==='training'?'التدريبات':'البحوث'}</a></div>`;return}}
-if(!allowed){const main=document.querySelector('main');if(main){main.innerHTML=adabGate(cat);return}}
+if(!allowed){
+  const main=document.querySelector('main');
+  if(main){main.innerHTML=adabGate(cat);return}
+}
+
+// تسجيل فتح المحتوى بعد اجتياز صلاحية الوصول فقط.
+if(isDetail && key){
+  try{
+    const token=sessionStorage.getItem('adab_cloud_student_token_v1');
+    if(token){
+      fetch('/api/student/progress',{
+        method:'POST',
+        headers:{
+          'content-type':'application/json',
+          'authorization':'Bearer '+token
+        },
+        body:JSON.stringify({
+          content_id:key,
+          percent:10
+        })
+      }).catch(()=>{});
+    }
+  }catch(e){}
+}
+
 // Filter cards by publication and permissions.
 const cards=document.querySelectorAll('.card[href]');cards.forEach(card=>{const href=card.getAttribute('href')||'';let targetCat=cat;let m=href.match(/^(?:lessons__|training__|research__)?(lesson|training|research)-(\d+)-(\d+)\.html$/);let am=href.match(/^axis-(\d+)\.html$/);if(m){const prefix=m[1];targetCat=prefix==='lesson'?'lessons':prefix;const id=targetCat+'-'+m[2]+'-'+m[3];if(pub&&pub[id]===false){card.hidden=true;}}else if(am&&pub){const ax=am[1], any=Object.keys(pub).some(id=>id.startsWith(cat+'-'+ax+'-')&&pub[id]!==false);if(!any)card.hidden=true;}});
 }
