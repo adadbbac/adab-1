@@ -69,8 +69,25 @@ function renderStats(){
  const rt=$('reportStudentCount');if(rt)rt.textContent=activeUs.length+' تلميذ';
  const tb=$('studentReportTable');
  if(tb){tb.innerHTML=activeUs.length?`<div class="report-table"><div class="report-row report-head"><b>التلميذ</b><b>الحالة</b><b>التقدم</b><b>المهمة</b><b>الملاحظات</b><b>الاختبارات</b></div>${activeUs.slice().sort((a,b)=>(b.progress||0)-(a.progress||0)).map(u=>{const m=u.mission||{};const r=tr.reduce((n,t)=>n+(t.results||[]).filter(x=>String(x.studentId)===String(u.id)).length,0);const nc=ns.filter(n=>String(n.studentId)===String(u.id)).length;return `<div class="report-row"><span>${u.name}</span><span>${statusLabel?statusLabel(u.status):u.status}</span><span><strong>${Number(u.progress)||0}%</strong></span><span>${m.assigned?(m.status==='reviewed'?'مراجعة مكتملة':m.status==='submitted'?'بانتظار المراجعة':'قيد الإنجاز'):'لا توجد'}</span><span>${nc}</span><span>${r}</span></div>`}).join('')}</div>`:'<div class="empty-state">لا توجد حسابات تلاميذ بعد.</div>'}
- const ra=$('recentActivity');const lg=readKey(LOG);ra.innerHTML=lg.length?lg.slice(-8).reverse().map(x=>`<div class="admin-note-row"><b>${x.action}</b><p>${x.detail||''}</p><small>${x.date}</small></div>`).join(''):'<div class="empty-state">لا نشاط مسجل بعد.</div>';
-}
+ const ra=$('recentActivity');
+const lg=CLOUD_ACTIVITY||[];
+ra.innerHTML=lg.length
+  ? lg.slice(0,8).map(x=>{
+      let detail=x.details_json||x.detail||'';
+      try{
+        const d=typeof detail==='string'?JSON.parse(detail):detail;
+        if(d&&typeof d==='object'){
+          detail=Object.entries(d).map(([k,v])=>`${k}: ${v}`).join(' · ');
+        }
+      }catch{}
+      const student=x.student_name||'';
+      return `<div class="admin-note-row">
+        <b>${student?student+' — ':''}${x.action||'نشاط'}</b>
+        <p>${detail}</p>
+        <small>${x.created_at||x.date||''}</small>
+      </div>`;
+    }).join('')
+  : '<div class="empty-state">لا نشاط مسجل بعد.</div>';
 function renderSettings(){const s=settingState(),c=credentials();if($('setNotice'))$('setNotice').checked=s.notice;if($('setMission'))$('setMission').checked=s.mission;if($('setReview'))$('setReview').checked=s.review;if($('setPlatformName'))$('setPlatformName').value=s.platformName;if($('setTeacherUser'))$('setTeacherUser').value=c.user;if($('setTeacherPass'))$('setTeacherPass').value='';}
 function renderSecurity(){const a=readKey(LOG),box=$('securityLog');if(!box)return;const q=($('logSearch')?.value||'').trim().toLowerCase(),lv=$('logLevel')?.value||'all';const rows=a.filter(x=>(lv==='all'||(x.level||'info')===lv)&&(!q||`${x.action} ${x.detail}`.toLowerCase().includes(q)));box.innerHTML=rows.length?rows.slice().reverse().map(x=>`<div class="admin-log-row log-${x.level||'info'}"><div><b>${x.action}</b><small>${x.detail||''}</small></div><small>${x.date}</small></div>`).join(''):'<div class="empty-state">لا توجد عمليات مطابقة.</div>';if($('logCount'))$('logCount').textContent=`${rows.length} عملية`}
 function renderAllExpanded(){renderAll();renderTrainingManager();renderTests();renderMedia();renderNotes();renderStats();renderSettings();renderSecurity()}
