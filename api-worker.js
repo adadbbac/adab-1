@@ -122,7 +122,7 @@ async function api(env,r,url){
   }
 
   if(path==='/api/teacher/login'&&method==='POST'){
-    const b=await body(r); if(String(b.username||'')!==String(env.TEACHER_USER||'')||String(b.password||'')!==String(env.TEACHER_PASS||'')){await log(env.DB,'system',null,'teacher_login_failed','warning');return bad('بيانات الأستاذ غير صحيحة',401);}
+    const b=await body(r); const username=String(b.username??b.user??''); const password=String(b.password??b.pass??''); if(username!==String(env.TEACHER_USER||'')||password!==String(env.TEACHER_PASS||'')){await log(env.DB,'system',null,'teacher_login_failed','warning');return bad('بيانات الأستاذ غير صحيحة',401);}
     const token=await makeToken(env,{type:'teacher',sub:'teacher'}); await log(env.DB,'teacher','teacher','login'); return json({ok:true,token});
   }
 
@@ -201,59 +201,9 @@ async function api(env,r,url){
     const s=await requireStudent(env,r); if(!s)return bad('غير مصرح',401); const rows=await env.DB.prepare('SELECT * FROM student_progress WHERE student_id=? ORDER BY last_seen_at DESC').bind(s.id).all(); return json({ok:true,progress:rows.results||[]});
   }
   if(path==='/api/student/progress'&&method==='POST'){
-  const s=await requireStudent(env,r);
-  if(!s)return bad('غير مصرح',401);
-
-  const b=await body(r);
-  if(!b.content_id)return bad('المحتوى غير محدد');
-
-  const pct=Math.max(0,Math.min(100,Number(b.percent||0)));
-  const state=pct>=100?'completed':'started';
-  const ts=now();
-
-  await env.DB.prepare(`
-    INSERT INTO student_progress(
-      id,student_id,content_id,state,percent,last_seen_at,completed_at
-    )
-    VALUES(?,?,?,?,?,?,?)
-    ON CONFLICT(student_id,content_id)
-    DO UPDATE SET
-      state=excluded.state,
-      percent=excluded.percent,
-      last_seen_at=excluded.last_seen_at,
-      completed_at=excluded.completed_at
-  `).bind(
-    id('prog'),
-    s.id,
-    b.content_id,
-    state,
-    pct,
-    ts,
-    state==='completed'?ts:null
-  ).run();
-
-  await log(
-    env.DB,
-    'student',
-    s.id,
-    'progress_update',
-    'info',
-    {
-      content_id:String(b.content_id),
-      percent:pct,
-      state
-    }
-  );
-
-  return json({
-    ok:true,
-    progress:{
-      content_id:b.content_id,
-      percent:pct,
-      state
-    }
-  });
-}
+    const s=await requireStudent(env,r); if(!s)return bad('غير مصرح',401); const b=await body(r); if(!b.content_id)return bad('المحتوى غير محدد'); const pct=Math.max(0,Math.min(100,Number(b.percent||0))); const state=pct>=100?'completed':'started'; const ts=now();
+    await env.DB.prepare(`INSERT INTO student_progress(id,student_id,content_id,state,percent,last_seen_at,completed_at) VALUES(?,?,?,?,?,?,?) ON CONFLICT(student_id,content_id) DO UPDATE SET state=excluded.state,percent=excluded.percent,last_seen_at=excluded.last_seen_at,completed_at=excluded.completed_at`).bind(id('prog'),s.id,b.content_id,state,pct,ts,state==='completed'?ts:null).run(); return json({ok:true});
+  }
 
   if(path==='/api/student/progress/overall'&&method==='POST'){
     const s=await requireStudent(env,r); if(!s)return bad('غير مصرح',401); const b=await body(r); const inc=Number(b.increment||0); const next=Math.max(0,Math.min(100,Number(s.progress||0)+inc));
@@ -315,37 +265,11 @@ async function api(env,r,url){
   if(path==='/api/teacher/media'&&method==='GET'){if(!(await requireTeacher(env,r)))return bad('غير مصرح',401);const rows=await env.DB.prepare('SELECT * FROM media_links ORDER BY created_at DESC').all();return json({ok:true,media:rows.results||[]});}
   if(path==='/api/teacher/media'&&method==='POST'){if(!(await requireTeacher(env,r)))return bad('غير مصرح',401);const b=await body(r);if(!b.title||!b.url)return bad('العنوان والرابط مطلوبان');const ts=now(),mid=id('media');await env.DB.prepare(`INSERT INTO media_links(id,title,url,axis_no,description,status,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)`).bind(mid,b.title,b.url,b.axis_no||null,b.description||null,b.status||'published','teacher',ts,ts).run();return json({ok:true,id:mid},201);}
 
-  if(path==='/api/teacher/activity'&&method==='GET'){
-  if(!(await requireTeacher(env,r)))return bad('غير مصرح',401);
-
-  const rows=await env.DB.prepare(`
-    SELECT
-      a.id,
-      a.actor_type,
-      a.actor_id,
-      a.action,
-      a.level,
-      a.details_json,
-      a.created_at,
-      s.name AS student_name,
-      s.school AS student_school,
-      s.phone AS student_phone,
-      s.status AS student_status
-    FROM activity_logs a
-    LEFT JOIN students s
-      ON s.id=a.actor_id
-      AND a.actor_type='student'
-    WHERE a.actor_type='student'
-    ORDER BY a.created_at DESC
-    LIMIT 500
-  `).all();
-
-  return json({
-    ok:true,
-    activities:rows.results||[],
-    logs:rows.results||[]
-  });
-}
+  if(path==='/api/teacher/tests'&&method==='GET'){
+    if(!(await requireTeacher(env,r)))return bad('غير مصرح',401); const rows=await env.DB.prepare('SELECT * FROM tests ORDER BY created_at DESC').all(); const tests=[];
+    for(const t of (rows.results||[])){const q=await env.DB.prepare('SELECT id,question_no,prompt,points FROM test_questions WHERE test_id=? ORDER BY question_no').bind(t.id).all(); const a=await env.DB.prepare('SELECT * FROM test_answers WHERE test_id=? ORDER BY submitted_at DESC').bind(t.id).all(); const as=await env.DB.prepare('SELECT * FROM test_assignments WHERE test_id=?').bind(t.id).all(); tests.push({...t,questions:q.results||[],answers:a.results||[],assignments:as.results||[]});}
+    return json({ok:true,tests});
+  }
   if(path==='/api/teacher/tests'&&method==='POST'){if(!(await requireTeacher(env,r)))return bad('غير مصرح',401);const b=await body(r);if(!b.title)return bad('عنوان الاختبار مطلوب');const ts=now(),tid=id('test'),status=b.published?'published':(b.status||'draft'),audience=b.student_id?'assigned':(b.audience||'public');await env.DB.prepare(`INSERT INTO tests(id,axis_no,title,description,status,audience,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)`).bind(tid,b.axis_no||null,b.title,b.description||null,status,audience,'teacher',ts,ts).run();if(Array.isArray(b.questions)){for(let i=0;i<b.questions.length;i++){const q=b.questions[i];await env.DB.prepare(`INSERT INTO test_questions(id,test_id,question_no,prompt,expected_answer,points,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)`).bind(id('q'),tid,i+1,q.prompt,q.expected_answer||null,Number(q.points||1),ts,ts).run();}}if(b.student_id){await env.DB.prepare(`INSERT OR IGNORE INTO test_assignments(id,test_id,student_id,assigned_at) VALUES(?,?,?,?)`).bind(id('assign'),tid,String(b.student_id),ts).run();}return json({ok:true,id:tid},201);}
 
   if(path==='/api/teacher/settings'&&method==='GET'){if(!(await requireTeacher(env,r)))return bad('غير مصرح',401);const rows=await env.DB.prepare('SELECT * FROM platform_settings ORDER BY setting_key').all();return json({ok:true,settings:rows.results||[]});}
@@ -368,7 +292,7 @@ export default {
   async fetch(request, env){
     const url=new URL(request.url);
     if(url.pathname.startsWith('/api/')){
-     try{return await api(env,request,url);}catch(e){console.error(e);return json({ok:false,error:'حدث خطأ داخلي',detail:String(e)},500);}
+      try{return await api(env,request,url);}catch(e){console.error(e);return json({ok:false,error:'حدث خطأ داخلي',detail:env.ENVIRONMENT==='development'?String(e):undefined},500);}
     }
     const cm=url.pathname.match(/^\/content\/([^/]+)$/);
     if(cm){
