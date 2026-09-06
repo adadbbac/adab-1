@@ -1,0 +1,24 @@
+الأدب العربي في البكالوريا 2.0 — إعداد D1 للنشر التجريبي
+
+Worker:
+  adabi
+
+D1 binding:
+  Variable name = DB
+  Database = adab-arabi
+
+تمت تهيئة D1 من لوحة Cloudflare:
+  Worker → Bindings → D1 database → DB → adab-arabi
+
+مهم:
+  هذه النسخة لا تعرّف D1 داخل wrangler.toml.
+  الـBinding موجود بالفعل في Dashboard، ولذلك لا نعيد تعريف database_id
+  أثناء Workers Builds.
+
+إعداد Workers Builds:
+  Build command: فارغ
+  Deploy command: npx wrangler deploy
+  Root directory: /
+  API token: Workers Builds - 2026-09-06 00:09
+
+لا تضع أي أسرار في GitHub.
