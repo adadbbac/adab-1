@@ -189,3 +189,4 @@ $('noticeForm').onsubmit=createCloudNoticeFromForm;
 $('noteForm').onsubmit=createCloudNote;
 $('settingsForm').onsubmit=saveCloudSettings;
 if(teacherCloudReady())setTimeout(async()=>{if(await syncTeacherCloud())renderAll()},0);
+}
