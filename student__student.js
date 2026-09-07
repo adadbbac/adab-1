@@ -4,7 +4,7 @@ const IS_PUBLISHED=location.protocol==='https:'&&!/^(localhost|127\.0\.0\.1)$/.t
 let CLOUD_STUDENT=null;
 const $=id=>document.getElementById(id), modal=$('accountModal'); let mode='login';
 const axes=['شعر الحماسة','المنزع العقلي','رسالة الغفران','مغامرة رأس المملوك جابر','حدث أبو هريرة قال'];
-function missionContentPath(id){const m=String(id||'').match(/^(lessons|training|research)-(\d+)-(\d+)$/); if(!m)return 'lessons__index.html'; const dir=m[1],prefix=dir==='lessons'?'lesson':dir; return ${dir==='lessons'?'lessons__':dir==='training'?'training__':'research__'}${prefix}-${m[2]}-${m[3]}.html;}
+function missionContentPath(id){const m=String(id||'').match(/^(lessons|training|research)-(\d+)-(\d+)$/); if(!m)return 'lessons__index.html'; const dir=m[1],prefix=dir==='lessons'?'lesson':dir; return `${dir==='lessons'?'lessons__':dir==='training'?'training__':'research__'}${prefix}-${m[2]}-${m[3]}.html`;}
 function students(){const local=JSON.parse(localStorage.getItem(KEY)||'[]'); if(CLOUD_STUDENT){const i=local.findIndex(x=>String(x.id)===String(CLOUD_STUDENT.id)); if(i>=0)local[i]={...local[i],...CLOUD_STUDENT}; else local.push(CLOUD_STUDENT); localStorage.setItem(KEY,JSON.stringify(local));} return local}
 function notices(){return JSON.parse(localStorage.getItem(NOTICES)||'[]')}
 function targetMatch(n,u){return n.target==='all'||n.target===u.status||n.target===('student:'+u.id)}
