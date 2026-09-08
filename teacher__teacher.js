@@ -112,7 +112,12 @@ $('clearLog')?.addEventListener('click',()=>{if(confirm('مسح سجل النش�
 $('printStats')?.addEventListener('click',()=>{renderStats();const html=$('stats').innerHTML;const w=window.open('','_blank');if(!w)return;w.document.write('<!doctype html><html lang=\"ar\" dir=\"rtl\"><head><meta charset=\"utf-8\"><title>تقرير المنصة</title><style>body{font-family:Arial,sans-serif;padding:30px;line-height:1.7;color:#123}h1{color:#0f8f92}.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat-card,.admin-panel{border:1px solid #ddd;border-radius:12px;padding:14px;margin:10px 0}.report-table{width:100%;border:1px solid #ddd}.report-row{display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr .7fr .7fr;gap:8px;padding:9px;border-bottom:1px solid #eee}.report-head{font-weight:bold;background:#f4f8f8}.admin-heading-actions,#refreshStats,#printStats{display:none!important}</style></head><body><h1>تقرير متابعة منصة الأدب العربي في البكالوريا</h1>'+html+'</body></html>');w.document.close();w.focus();w.print()});
 const _showOriginal=show; show=function(){_showOriginal();fillTestStudents();fillNoteContexts();renderAllExpanded()};
 // record core existing actions by wrapping selected controls
-$('adminLogout')?.addEventListener('click',()=>logAction('خروج من فضاء الأستاذ'));
+$('adminLogout')?.addEventListener('click',()=>{
+  sessionStorage.removeItem(AU);
+  sessionStorage.removeItem(CLOUD_T);
+  logAction('خروج من فضاء الأستاذ');
+  hide();
+});
 if(sessionStorage.getItem(AU)==='1')setTimeout(()=>show(),0);
 
 /* ===== 2.0 CLOUD BRIDGE: shared teacher workspace ===== */
