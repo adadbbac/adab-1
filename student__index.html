@@ -38,12 +38,36 @@
 </section>
 
 <section class="mission-card student-main-mission">
-  <div>
-    <span>مهمتك الآن</span>
-    <h2 id="missionTitle">ابدأ ببناء فهمك</h2>
-    <p id="missionText">اختر درسًا واحدًا ثم انتقل إلى التدريب المرتبط به.</p>
+  <div class="section-title-row mission-card-heading">
+    <div>
+      <span>مهمتك الآن</span>
+      <h2 id="missionTitle">ابدأ ببناء فهمك</h2>
+      <p id="missionText">اختر درسًا واحدًا ثم انتقل إلى التدريب المرتبط به.</p>
+    </div>
+    <a class="primary-btn inline" id="missionLink" href="lessons__index.html">فتح المحتوى ←</a>
   </div>
-  <a class="primary-btn inline" id="missionLink" href="lessons__index.html">متابعة المهمة ←</a>
+
+  <div class="mission-workspace-compact">
+    <div class="mission-brief">
+      <a id="workspaceContentLink" class="notice-link" href="#" target="_blank">فتح المحتوى المرتبط ↗</a>
+    </div>
+
+    <form id="missionSubmissionForm" class="notice-form">
+      <label>
+        إنجازك
+        <textarea id="missionSubmission" rows="5" placeholder="اكتب إجابتك أو إنتاجك هنا..." required></textarea>
+      </label>
+
+      <div class="composer-actions">
+        <small class="muted">أرسل عملك عندما تنتهي ليظهر للأستاذ للمراجعة.</small>
+        <button class="primary-btn" type="submit" id="submitMission">إرسال الإنجاز إلى الأستاذ</button>
+      </div>
+
+      <div id="missionSubmissionFeedback" class="form-feedback"></div>
+    </form>
+
+    <div id="missionReview" class="mission-review" hidden></div>
+  </div>
 </section>
   <section class="panel mission-workspace" id="missionWorkspace"><div class="section-title-row"><div><span class="student-badge">مساحة الإنجاز</span><h2>إنجاز مهمتك</h2><span class="muted">لا تُحتسب المهمة منجزة بمجرد فتح المحتوى؛ أرسل عملك من هنا.</span></div><span class="status-pill" id="missionStatus">مهمة جديدة</span></div><div class="mission-workspace-body"><div class="mission-brief"><h3 id="workspaceMissionTitle">—</h3><p id="workspaceMissionText">ستظهر تعليمات الأستاذ هنا.</p><a id="workspaceContentLink" class="notice-link" href="#" target="_blank">فتح المحتوى المرتبط ↗</a></div><form id="missionSubmissionForm" class="notice-form"><label>إنجازك<textarea id="missionSubmission" rows="9" placeholder="اكتب إجابتك أو إنتاجك هنا..." required></textarea></label><div class="composer-actions"><small class="muted">أرسل عملك عندما تنتهي. سيظهر للأستاذ ليراجعه ويكتب لك ملاحظته.</small><button class="primary-btn" type="submit" id="submitMission">إرسال الإنجاز إلى الأستاذ</button></div><div id="missionSubmissionFeedback" class="form-feedback"></div></form><div id="missionReview" class="mission-review" hidden></div></div></section>
   <section class="student-tools-grid">
