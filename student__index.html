@@ -69,18 +69,43 @@
     <div id="missionReview" class="mission-review" hidden></div>
   </div>
 </section>
-  <section class="panel mission-workspace" id="missionWorkspace"><div class="section-title-row"><div><span class="student-badge">مساحة الإنجاز</span><h2>إنجاز مهمتك</h2><span class="muted">لا تُحتسب المهمة منجزة بمجرد فتح المحتوى؛ أرسل عملك من هنا.</span></div><span class="status-pill" id="missionStatus">مهمة جديدة</span></div><div class="mission-workspace-body"><div class="mission-brief"><h3 id="workspaceMissionTitle">—</h3><p id="workspaceMissionText">ستظهر تعليمات الأستاذ هنا.</p><a id="workspaceContentLink" class="notice-link" href="#" target="_blank">فتح المحتوى المرتبط ↗</a></div><form id="missionSubmissionForm" class="notice-form"><label>إنجازك<textarea id="missionSubmission" rows="9" placeholder="اكتب إجابتك أو إنتاجك هنا..." required></textarea></label><div class="composer-actions"><small class="muted">أرسل عملك عندما تنتهي. سيظهر للأستاذ ليراجعه ويكتب لك ملاحظته.</small><button class="primary-btn" type="submit" id="submitMission">إرسال الإنجاز إلى الأستاذ</button></div><div id="missionSubmissionFeedback" class="form-feedback"></div></form><div id="missionReview" class="mission-review" hidden></div></div></section>
-  <section class="student-tools-grid">
-    <a class="student-tool" href="lessons__index.html"><span>▣</span><div><h2>المحتوى التعليمي</h2><p>المحاور والدروس والموارد، مع متابعة آخر نقطة وصلت إليها.</p></div></a>
-    <a class="student-tool" href="training__index.html" id="trainingTool"><span>◎</span><div><h2>التدريبات</h2><p>تدريبات متدرجة من التشخيص والعلاج إلى الإنتاج.</p></div></a>
-    <a class="student-tool" href="research__index.html" id="researchTool"><span>◇</span><div><h2>خزانة الوثائق</h2><p>بحوث ومواد الموقع للقراءة، وملفات خارجية محفوظة في فضائك.</p></div></a>
-    <a class="student-tool" href="#"><span>✎</span><div><h2>كراس الإنتاج</h2><p>أعمالك المكتوبة، إرسالها إلى الأستاذ، واستقبال الملاحظات.</p></div></a>
-    <a class="student-tool" href="#messages" id="openMessages"><span>✉</span><div><h2>الرسائل</h2><p>تواصل منظم مع الأستاذ وإرسال التدريبات والأعمال والمقترحات.</p></div></a>
-    <a class="student-tool" href="#"><span>↗</span><div><h2>مساري</h2><p>صورة مبسطة عن تقدمك العلمي وما أنجزته في كل محور.</p></div></a>
-  </section>
-  <section class="panel" id="messages"><div class="section-title-row"><div><h2>الرسائل مع الأستاذ</h2><span class="muted">هنا ترسل رسائلك وتستقبل ردود الأستاذ</span></div><span class="status-pill" id="messageSectionCount">0</span></div><form id="studentMessageForm" class="message-composer"><textarea id="studentMessageInput" rows="5" placeholder="اكتب رسالتك إلى الأستاذ..." required></textarea><div class="composer-actions"><small class="muted">يمكنك إرسال استفسار، مقترح، طلب مساعدة، أو متابعة عملك.</small><button class="primary-btn" type="submit">إرسال إلى الأستاذ</button></div><div id="studentMessageFeedback" class="form-feedback"></div></form><div id="studentMessagesList" class="messages-list"></div></section>
-  <section class="panel student-extra-panel" id="studentTests"><div class="section-title-row"><div><h2>اختباراتي</h2><span class="muted">اختبارات قصيرة يرسلها الأستاذ لقياس الفهم والتقدم.</span></div><span class="status-pill" id="studentTestCount">0</span></div><div id="studentTestList" class="admin-tests"></div></section><section class="panel student-extra-panel" id="studentNotes"><div class="section-title-row"><div><h2>ملاحظات الأستاذ</h2><span class="muted">تغذية راجعة تساعدك على معرفة ما أتقنته وما يحتاج إلى دعم.</span></div><span class="muted">مرافقة</span></div><div id="studentNotesList" class="admin-notes"></div></section><section class="panel"><div class="section-title-row"><h2>آخر المحتويات المضافة أو المحدثة</h2><span class="muted">يتجدد هذا القسم مع إدارة الأستاذ</span></div><div class="updates-list"><div><b>تحديث تدريبات شعر الحماسة</b><small>أضيفت أنشطة جديدة في مرحلة العلاج والدعم.</small></div><div><b>مورد جديد في المنزع العقلي</b><small>مادة داعمة لفهم الاستدلال والحجاج.</small></div><div><b>تذكير</b><small>يمكنك إرسال إنتاجك إلى الأستاذ من كراس الإنتاج.</small></div></div></section>
-  <section class="panel progress-panel"><div class="section-title-row"><h2>مساري</h2><span id="progressValue">0%</span></div><div class="progress-track"><i id="progressBar"></i></div><p>يتقدم مسارك مع المشاهدة والإنجاز. في النموذج التجريبي يمكنك تسجيل خطوة من «مهمتك الآن».</p><button class="ghost-btn" id="markProgress">سجّل إنجاز خطوة</button></section><section class="panel notice-panel"><div class="section-title-row"><h2>الإعلانات والتنبيهات</h2><span class="muted">من الأستاذ</span></div><div class="notice-list" id="studentNoticeList"><div>🌿 مرحبًا بك في فضائك الشخصي.</div><div>📘 تابع آخر الدروس والتدريبات من قسم المحتوى التعليمي.</div></div></section><section class="panel"><div class="section-title-row"><h2>آخر الرسائل</h2><span class="status-pill" id="messageCount">0</span></div><div id="messagesPreview" class="messages-preview"></div></section>
+
+<nav class="student-section-nav" aria-label="التنقل داخل فضاء التلميذ">
+  <a href="#dashboard">الرئيسية</a>
+  <a href="lessons__index.html">المحتوى التعليمي</a>
+  <a href="training__index.html">التدريبات</a>
+  <a href="research__index.html">البحوث</a>
+  <a href="#missionSubmissionForm">الإنجاز</a>
+  <a href="#messages">الرسائل</a>
+  <a href="#studentNoticeList">الإعلانات</a>
+  <a href="#studentTests">اختباراتي</a>
+  <a href="#studentNotes">ملاحظات الأستاذ</a>
+  <a href="#progressPanel">مساري</a>
+  <a href="#messagesPreview">آخر الرسائل</a>
+</nav>
+
+<section class="student-tools-grid">
+  <a class="student-tool" href="lessons__index.html"><span>▣</span><div><h2>المحتوى التعليمي</h2><p>المحاور والدروس والموارد، مع متابعة آخر نقطة وصلت إليها.</p></div></a>
+  <a class="student-tool" href="training__index.html" id="trainingTool"><span>◎</span><div><h2>التدريبات</h2><p>تدريبات متدرجة من التشخيص والعلاج إلى الإنتاج.</p></div></a>
+  <a class="student-tool" href="research__index.html" id="researchTool"><span>◇</span><div><h2>خزانة الوثائق</h2><p>بحوث ومواد الموقع للقراءة، وملفات خارجية محفوظة في فضائك.</p></div></a>
+  <a class="student-tool" href="#"><span>✎</span><div><h2>كراس الإنتاج</h2><p>أعمالك المكتوبة، إرسالها إلى الأستاذ، واستقبال الملاحظات.</p></div></a>
+  <a class="student-tool" href="#messages" id="openMessages"><span>✉</span><div><h2>الرسائل</h2><p>تواصل منظم مع الأستاذ وإرسال التدريبات والأعمال والمقترحات.</p></div></a>
+  <a class="student-tool" href="#progressPanel"><span>↗</span><div><h2>مساري</h2><p>صورة مبسطة عن تقدمك العلمي وما أنجزته في كل محور.</p></div></a>
+</section>
+
+<section class="panel" id="messages"><div class="section-title-row"><div><h2>الرسائل مع الأستاذ</h2><span class="muted">هنا ترسل رسائلك وتستقبل ردود الأستاذ</span></div><span class="status-pill" id="messageSectionCount">0</span></div><form id="studentMessageForm" class="message-composer"><textarea id="studentMessageInput" rows="5" placeholder="اكتب رسالتك إلى الأستاذ..." required></textarea><div class="composer-actions"><small class="muted">يمكنك إرسال استفسار، مقترح، طلب مساعدة، أو متابعة عملك.</small><button class="primary-btn" type="submit">إرسال إلى الأستاذ</button></div><div id="studentMessageFeedback" class="form-feedback"></div></form><div id="studentMessagesList" class="messages-list"></div></section>
+
+<section class="panel student-extra-panel" id="studentTests"><div class="section-title-row"><div><h2>اختباراتي</h2><span class="muted">اختبارات قصيرة يرسلها الأستاذ لقياس الفهم والتقدم.</span></div><span class="status-pill" id="studentTestCount">0</span></div><div id="studentTestList" class="admin-tests"></div></section>
+
+<section class="panel student-extra-panel" id="studentNotes"><div class="section-title-row"><div><h2>ملاحظات الأستاذ</h2><span class="muted">تغذية راجعة تساعدك على معرفة ما أتقنته وما يحتاج إلى دعم.</span></div><span class="muted">مرافقة</span></div><div id="studentNotesList" class="admin-notes"></div></section>
+
+<section class="panel"><div class="section-title-row"><h2>آخر المحتويات المضافة أو المحدثة</h2><span class="muted">يتجدد هذا القسم مع إدارة الأستاذ</span></div><div class="updates-list"><div><b>تحديث تدريبات شعر الحماسة</b><small>أضيفت أنشطة جديدة في مرحلة العلاج والدعم.</small></div><div><b>مورد جديد في المنزع العقلي</b><small>مادة داعمة لفهم الاستدلال والحجاج.</small></div><div><b>تذكير</b><small>يمكنك إرسال إنتاجك إلى الأستاذ من كراس الإنتاج.</small></div></div></section>
+
+<section class="panel progress-panel" id="progressPanel"><div class="section-title-row"><h2>مساري</h2><span id="progressValue">0%</span></div><div class="progress-track"><i id="progressBar"></i></div><p>يتقدم مسارك مع المشاهدة والإنجاز. في النموذج التجريبي يمكنك تسجيل خطوة من «مهمتك الآن».</p><button class="ghost-btn" id="markProgress">سجّل إنجاز خطوة</button></section>
+
+<section class="panel notice-panel"><div class="section-title-row"><h2>الإعلانات والتنبيهات</h2><span class="muted">من الأستاذ</span></div><div class="notice-list" id="studentNoticeList"><div>🌿 مرحبًا بك في فضائك الشخصي.</div><div>📘 تابع آخر الدروس والتدريبات من قسم المحتوى التعليمي.</div></div></section>
+
+<section class="panel"><div class="section-title-row"><h2>آخر الرسائل</h2><span class="status-pill" id="messageCount">0</span></div><div id="messagesPreview" class="messages-preview"></div></section>
 </section>
 </main><footer>الأدب العربي في البكالوريا · فضاء التلميذ</footer>
 <div class="account-modal" id="accountModal" hidden><div class="modal-backdrop" data-close></div><div class="account-dialog"><button class="modal-close" data-close>×</button><h2 id="modalTitle">تسجيل الدخول</h2><p id="modalIntro">أدخل رقم الهاتف وكلمة العبور للدخول إلى فضائك.</p><form id="accountForm"><div class="form-field" id="nameField" hidden><label>الاسم واللقب</label><input id="nameInput" autocomplete="name" minlength="2"></div><div class="form-field" id="schoolField" hidden><label>المعهد</label><input id="schoolInput" minlength="2"></div><div class="form-field"><label>رقم الهاتف</label><input id="phoneInput" inputmode="tel" minlength="6" required></div><div class="form-field"><label>كلمة العبور</label><input id="passwordInput" type="password" minlength="6" required></div><button class="primary-btn full" type="submit" id="formSubmit">دخول</button></form><div class="modal-links"><button id="switchSignup" class="link-btn">إنشاء حساب جديد</button><button id="forgot" class="link-btn">نسيت كلمة العبور؟</button></div><div id="formFeedback" class="form-feedback"></div></div></div>
