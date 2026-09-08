@@ -140,19 +140,163 @@ function cloudContentView(x){
 }
 async function syncTeacherCloud(){
   if(!teacherCloudReady())return false;
+
+  const safe=async(path,fallback)=>{
+    try{
+      return await cloudJson(path);
+    }catch(e){
+      return fallback;
+    }
+  };
+
   try{
-    const [st,co,mi,ms,no,an,te,me,se,lg]=await Promise.all([
-      cloudJson('/teacher/students'),cloudJson('/teacher/content'),cloudJson('/teacher/missions'),cloudJson('/teacher/messages'),cloudJson('/teacher/notes'),cloudJson('/teacher/announcements'),cloudJson('/teacher/tests'),cloudJson('/teacher/media'),cloudJson('/teacher/settings'),cloudJson('/teacher/activity')
-    ]);
-    CLOUD_STUDENTS=st.students||[]; CLOUD_CONTENT=(co.items||[]).map(cloudContentView); CLOUD_MISSIONS=mi.missions||[]; CLOUD_MESSAGES=ms.messages||[]; CLOUD_NOTES=no.notes||[]; CLOUD_NOTICES=an.announcements||[]; CLOUD_TESTS=te.tests||[]; CLOUD_MEDIA=me.media||[]; CLOUD_SETTINGS=se.settings||[]; CLOUD_ACTIVITY=lg.activities||lg.logs||[];;
-    localStorage.setItem(KEY,JSON.stringify(CLOUD_STUDENTS)); localStorage.setItem(PUB,JSON.stringify(Object.fromEntries(CLOUD_CONTENT.map(x=>[x.id,x.status==='published']))));
-    localStorage.setItem(TESTS,JSON.stringify(CLOUD_TESTS.map(t=>({...t,published:t.status==='published',axisLabel:AXIS_LABELS[t.axis_no]||'',questions:t.questions||[],results:(t.answers||[]).reduce((a,x)=>{let r=a.find(z=>z.studentId===x.student_id);if(!r){r={studentId:x.student_id,answers:[],studentName:(CLOUD_STUDENTS.find(s=>String(s.id)===String(x.student_id))||{}).name||'تلميذ',date:x.submitted_at};a.push(r)}r.answers.push(x.answer_text);return a},[])}))));
-    localStorage.setItem(MEDIA,JSON.stringify(CLOUD_MEDIA.map(m=>({...m,published:m.status==='published',type:m.type||'link',axisLabel:AXIS_LABELS[m.axis_no]||''}))));
-    localStorage.setItem(NOTES,JSON.stringify(CLOUD_NOTES.map(n=>({id:n.id,studentId:n.student_id,studentName:n.student_name||'',type:n.note_type,text:n.note_text,contextId:n.linked_content_id,contextTitle:cloudContentView(CLOUD_CONTENT.find(c=>c.id===n.linked_content_id)||{}).title||'',reply:n.student_reply?{text:n.student_reply,date:n.replied_at}:null,date:n.created_at}))));
-    localStorage.setItem(NOTICES,JSON.stringify(CLOUD_NOTICES.map(n=>({id:n.id,type:n.kind,typeLabel:n.kind==='announcement'?'إعلان عام':'تنبيه',title:n.title,text:n.body,target:n.target_student_id?'student:'+n.target_student_id:'all',studentId:n.target_student_id,contentId:n.linked_content_id,date:n.created_at}))));
-    localStorage.setItem(LOG,JSON.stringify(CLOUD_ACTIVITY.map(x=>({date:x.created_at,action:x.action,detail:x.details_json||'',level:x.level||'info'}))));
+    const st=await cloudJson('/teacher/students');
+
+    CLOUD_STUDENTS=st.students||[];
+    localStorage.setItem(KEY,JSON.stringify(CLOUD_STUDENTS));
+
+    const co=await safe('/teacher/content',{items:[]});
+    CLOUD_CONTENT=(co.items||[]).map(cloudContentView);
+
+    const mi=await safe('/teacher/missions',{missions:[]});
+    CLOUD_MISSIONS=mi.missions||[];
+
+    const ms=await safe('/teacher/messages',{messages:[]});
+    CLOUD_MESSAGES=ms.messages||[];
+
+    const no=await safe('/teacher/notes',{notes:[]});
+    CLOUD_NOTES=no.notes||[];
+
+    const an=await safe('/teacher/announcements',{announcements:[]});
+    CLOUD_NOTICES=an.announcements||[];
+
+    const te=await safe('/teacher/tests',{tests:[]});
+    CLOUD_TESTS=te.tests||[];
+
+    const me=await safe('/teacher/media',{media:[]});
+    CLOUD_MEDIA=me.media||[];
+
+    const se=await safe('/teacher/settings',{settings:[]});
+    CLOUD_SETTINGS=se.settings||[];
+
+    const lg=await safe('/teacher/activity',{activities:[],logs:[]});
+    CLOUD_ACTIVITY=lg.activities||lg.logs||[];
+
+    localStorage.setItem(
+      PUB,
+      JSON.stringify(
+        Object.fromEntries(
+          CLOUD_CONTENT.map(x=>[x.id,x.status==='published'])
+        )
+      )
+    );
+
+    localStorage.setItem(
+      TESTS,
+      JSON.stringify(
+        CLOUD_TESTS.map(t=>({
+          ...t,
+          published:t.status==='published',
+          axisLabel:AXIS_LABELS[t.axis_no]||'',
+          questions:t.questions||[],
+          results:(t.answers||[]).reduce((a,x)=>{
+            let r=a.find(z=>z.studentId===x.student_id);
+
+            if(!r){
+              r={
+                studentId:x.student_id,
+                answers:[],
+                studentName:
+                  (CLOUD_STUDENTS.find(
+                    s=>String(s.id)===String(x.student_id)
+                  )||{}).name||'تلميذ',
+                date:x.submitted_at
+              };
+              a.push(r);
+            }
+
+            r.answers.push(x.answer_text);
+            return a;
+          },[])
+        }))
+      )
+    );
+
+    localStorage.setItem(
+      MEDIA,
+      JSON.stringify(
+        CLOUD_MEDIA.map(m=>({
+          ...m,
+          published:m.status==='published',
+          type:m.type||'link',
+          axisLabel:AXIS_LABELS[m.axis_no]||''
+        }))
+      )
+    );
+
+    localStorage.setItem(
+      NOTES,
+      JSON.stringify(
+        CLOUD_NOTES.map(n=>({
+          id:n.id,
+          studentId:n.student_id,
+          studentName:n.student_name||'',
+          type:n.note_type,
+          text:n.note_text,
+          contextId:n.linked_content_id,
+          contextTitle:
+            cloudContentView(
+              CLOUD_CONTENT.find(c=>c.id===n.linked_content_id)||{}
+            ).title||'',
+          reply:n.student_reply
+            ? {
+                text:n.student_reply,
+                date:n.replied_at
+              }
+            : null,
+          date:n.created_at
+        }))
+      )
+    );
+
+    localStorage.setItem(
+      NOTICES,
+      JSON.stringify(
+        CLOUD_NOTICES.map(n=>({
+          id:n.id,
+          type:n.kind,
+          typeLabel:n.kind==='announcement'
+            ?'إعلان عام'
+            :'تنبيه',
+          title:n.title,
+          text:n.body,
+          target:n.target_student_id
+            ?'student:'+n.target_student_id
+            :'all',
+          studentId:n.target_student_id,
+          contentId:n.linked_content_id,
+          date:n.created_at
+        }))
+      )
+    );
+
+    localStorage.setItem(
+      LOG,
+      JSON.stringify(
+        CLOUD_ACTIVITY.map(x=>({
+          date:x.created_at,
+          action:x.action,
+          detail:x.details_json||'',
+          level:x.level||'info'
+        }))
+      )
+    );
+
     return true;
-  }catch(e){return false}
+
+  }catch(e){
+    return false;
+  }
 }
 function list(){return CLOUD_STUDENTS||JSON.parse(localStorage.getItem(KEY)||'[]')}
 function pubMap(){if(CLOUD_CONTENT.length)return Object.fromEntries(CLOUD_CONTENT.map(x=>[x.id,x.status==='published']));let v=JSON.parse(localStorage.getItem(PUB)||'null');if(!v){v={};CONTENT.forEach(x=>v[x.id]=true);localStorage.setItem(PUB,JSON.stringify(v))}return v}
