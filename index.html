@@ -8,11 +8,56 @@
 <link rel="stylesheet" href="style.css">
 <style>
 @media(max-width:700px){
-  .home main{transform:translateX(-16px)}
-  .home-header .header-inner{position:relative}
-  .home-header .teacher-space{position:absolute;top:50%;transform:translateY(-50%);left:58px}
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  .home main{transform:none!important;width:100%;max-width:100%;box-sizing:border-box}
+  .home-header,.home-header *{box-sizing:border-box}
+  .home-header .header-inner{
+    position:relative;
+    width:100%;
+    max-width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .home-header .student-space,
+  .home-header .teacher-space,
+  .home-header .search-wrap{
+    position:static!important;
+    transform:none!important;
+    left:auto!important;
+    top:auto!important;
+    margin:0!important;
+  }
+  .home-header .search-wrap{order:1}
+  .home-header .teacher-space{order:2}
+  .home-header .student-space{order:3}
+  .home-header .logo-brand{order:0;flex:0 0 100%;text-align:center}
+  .home-header .brand-logo{max-width:100%;height:auto}
+  .hero-home,.features,.axes-section,.closing-card{
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+  .axis-grid{width:100%;max-width:100%}
+  img{max-width:100%;height:auto}
 }
 </style>
+
+<style id="homepage-fixes">
+.search-results mark{
+  font-weight:800;
+  padding:0 .12em;
+  border-radius:.25em;
+}
+@media(max-width:700px){
+  .search-dialog{width:calc(100% - 24px);max-width:calc(100% - 24px)}
+  .search-item{min-width:0}
+  .search-item small{overflow-wrap:anywhere}
+}
+</style>
+
 </head>
 <body class="home">
 <header class="home-header">
@@ -20,12 +65,12 @@
     <a class="student-space" href="student__index.html" aria-label="الدخول إلى فضاء التلميذ">
       <span class="icon">♙</span><span>فضاء التلميذ</span>
     </a>
-    <a class="teacher-space" href="teacher__index.html" aria-label="الدخول إلى فضاء الأستاذ">
-      <span class="icon">♜</span><span>فضاء الأستاذ</span>
+    <a class="teacher-space" href="teacher__index.html" aria-label="الدخول إلى الأستاذ صـالح الدريـدي">
+      <span class="icon">♜</span><span>الأستاذ صـالح الدريـدي</span>
     </a>
     <div class="search-wrap">
       <button class="search-pill" id="openSearch" type="button" aria-label="البحث في المحتوى">
-        <span class="search-icon">⌕</span><span>ابحث في المحتوى...</span>
+        <span class="search-icon">⌕</span><span>ابحث في الموقع</span>
       </button>
     </div>
     <div class="laurel-brand logo-brand" aria-label="الأدب العربي في البكالوريا">
@@ -114,28 +159,89 @@
 <script>
 (function(){
   const modal=document.getElementById('searchModal'), input=document.getElementById('searchInput'), results=document.getElementById('searchResults');
-  let index=[];
   const labels={محور:'محور',درس:'درس',تدريب:'تدريب',بحث:'بحث'};
-  const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  function norm(s){return (s||'').toLocaleLowerCase('ar').replace(/[إأآا]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[ً-ٟ]/g,'').trim();}
+  const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  function norm(s){
+    return (s||'').toLocaleLowerCase('ar')
+      .replace(/[إأآٱا]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه')
+      .replace(/[ً-ٟ]/g,'').replace(/\s+/g,' ').trim();
+  }
+  function makeSnippet(text,q){
+    const raw=String(text||'').replace(/\s+/g,' ').trim();
+    const nq=norm(q);
+    if(!raw||!nq) return '';
+    const nt=norm(raw), pos=nt.indexOf(nq);
+    if(pos<0) return raw.slice(0,190)+(raw.length>190?'…':'');
+    const start=Math.max(0,pos-90), end=Math.min(raw.length,pos+nq.length+100);
+    let snippet=raw.slice(start,end);
+    if(start>0) snippet='…'+snippet;
+    if(end<raw.length) snippet+='…';
+    const escaped=esc(snippet);
+    const terms=q.trim().split(/\s+/).filter(Boolean).map(esc).sort((a,b)=>b.length-a.length);
+    let marked=escaped;
+    terms.forEach(term=>{
+      if(term) marked=marked.replace(new RegExp('('+term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+    });
+    return marked;
+  }
   function score(e,q){
-    const n=norm(q), t=norm(e.title), x=norm(e.text); let z=0;
-    if(t===n) z+=100; else if(t.startsWith(n)) z+=65; else if(t.includes(n)) z+=45;
-    if(x.includes(n)) z+=20;
-    const words=n.split(/\s+/).filter(Boolean); z+=words.reduce((a,w)=>a+(t.includes(w)?10:0)+(x.includes(w)?3:0),0);
+    const n=norm(q), t=norm(e.title), x=norm(e.text);
+    let z=0;
+    if(t===n) z+=100;
+    else if(t.startsWith(n)) z+=65;
+    else if(t.includes(n)) z+=45;
+    if(x.includes(n)) z+=35;
+    const words=n.split(/\s+/).filter(Boolean);
+    z+=words.reduce((a,w)=>a+(t.includes(w)?10:0)+(x.includes(w)?4:0),0);
     return z;
   }
+
+  // فهرس داخلي قابل للعمل مع ملف index.html مستقل، مع الاحتفاظ بالمحاور الحالية.
+  const index=[
+    ...[...document.querySelectorAll('.axis-card')].map(card=>({
+      kind:'محور',
+      title:card.dataset.axis || card.querySelector('h3')?.textContent || '',
+      text:(card.dataset.search||'')+' '+(card.querySelector('.axis-body')?.innerText||''),
+      url:card.querySelector('a')?.getAttribute('href')||'#'
+    })),
+    {kind:'درس',title:'الدروس',text:'دروس الأدب العربي في البكالوريا فهم النص وتحليل الأدب والمحاور',url:'student__index.html'},
+    {kind:'تدريب',title:'التدريبات',text:'تدريبات تفاعلية في الأدب العربي والحجاج والتحليل والتأليف والمقال الجدلي',url:'student__index.html'},
+    {kind:'بحث',title:'البحوث',text:'بحوث أدبية ودراسات حول الأدب العربي والمحاور المقررة',url:'student__index.html'}
+  ];
+
   function render(q=''){
-    if(!q.trim()){results.innerHTML='<div class="search-empty">اكتب كلمة أو عبارة للبحث في الدروس والتدريبات والبحوث والمحاور.</div>';return;}
-    const ranked=index.map(e=>({...e,_score:score(e,q)})).filter(e=>e._score>0).sort((a,b)=>b._score-a._score).slice(0,24);
-    results.innerHTML=ranked.length?ranked.map(e=>`<a class="search-item" href="${esc(e.url)}"><span class="search-kind">${esc(labels[e.kind]||e.kind)}</span><div><b>${esc(e.title)}</b><small>${esc((e.text||'').slice(0,150))}${(e.text||'').length>150?'…':''}</small></div><span class="search-arrow">←</span></a>`).join(''):'<div class="no-results">لا توجد نتيجة مطابقة. جرّب كلمة أخرى أو اسم محور.</div>';
+    if(!q.trim()){
+      results.innerHTML='<div class="search-empty">اكتب كلمة أو عبارة للبحث في الدروس والتدريبات والبحوث والمحاور.</div>';
+      return;
+    }
+    const ranked=index.map(e=>({...e,_score:score(e,q)}))
+      .filter(e=>e._score>0)
+      .sort((a,b)=>b._score-a._score)
+      .slice(0,24);
+
+    results.innerHTML=ranked.length
+      ? ranked.map(e=>`<a class="search-item" href="${esc(e.url)}">
+          <span class="search-kind">${esc(labels[e.kind]||e.kind)}</span>
+          <div><b>${esc(e.title)}</b><small>${makeSnippet(e.text,q)}</small></div>
+          <span class="search-arrow">←</span>
+        </a>`).join('')
+      : '<div class="no-results">لا توجد نتيجة مطابقة. جرّب كلمة أخرى أو عبارة أقصر.</div>';
   }
-  async function open(){modal.hidden=false;document.body.classList.add('modal-open');setTimeout(()=>input.focus(),50);if(!index.length){try{index=await fetch('search-index.json').then(r=>r.json())}catch(e){index=[]}}render(input.value);}
+
+  function open(){
+    modal.hidden=false;
+    document.body.classList.add('modal-open');
+    setTimeout(()=>input.focus(),50);
+    render(input.value);
+  }
   function close(){modal.hidden=true;document.body.classList.remove('modal-open');}
   document.getElementById('openSearch').addEventListener('click',open);
   modal.querySelectorAll('[data-close-search]').forEach(el=>el.addEventListener('click',close));
   input.addEventListener('input',()=>render(input.value));
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close();if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();open();}});
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&!modal.hidden)close();
+    if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();open();}
+  });
 })();
 </script>
 </body>

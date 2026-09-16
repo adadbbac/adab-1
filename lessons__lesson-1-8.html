@@ -65,6 +65,66 @@ hr{border:0;border-top:1px solid #e7dfd0;margin:24px 0}
 .starbar{font-size:2rem;letter-spacing:5px;color:#d7c9a4}
 .finalbox{background:linear-gradient(135deg,#fffdf7,var(--turq-soft));border:2px solid #b9ddd6}
 @media(max-width:700px){body{font-size:18px}.matrix{grid-template-columns:1fr 1fr}.matrix .head{display:none}}
+
+/* إصلاح العرض على الشاشات الصغيرة — دون تغيير التصميم الأصلي */
+html, body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+*, *::before, *::after{
+  max-width:100%;
+}
+img, svg, video, canvas{
+  max-width:100%;
+  height:auto;
+}
+pre, code{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.wrap, .navinner, .nav, .hero, .shell, .main{
+  width:100%;
+  max-width:100%;
+  margin-left:auto;
+  margin-right:auto;
+}
+@media (max-width:700px){
+  body{
+    width:100%;
+    overflow-x:hidden;
+  }
+  .wrap, .navinner, .nav, .hero, .shell, .main{
+    box-sizing:border-box;
+  }
+  .nav{
+    gap:8px;
+  }
+  .navlinks{
+    max-width:100%;
+  }
+  .hero{
+    overflow:hidden;
+  }
+  .heroArt{
+    max-width:none;
+  }
+  .card, .activity, .main, .topbar{
+    min-width:0;
+  }
+  .card *, .activity *, .main *, .topbar *{
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+  .choices, .options, .creativeChoices, .matchGrid, .mapRow, .grid{
+    max-width:100%;
+  }
+  .choices > *, .options > *, .creativeChoices > *, .matchGrid > *, .mapRow > *, .grid > *{
+    min-width:0;
+    max-width:100%;
+  }
+}
+
 </style>
 </head>
 <body>
