@@ -11,16 +11,21 @@
   html,body{width:100%;max-width:100%;overflow-x:hidden}
   .home main{transform:none!important;width:100%;max-width:100%;box-sizing:border-box}
   .home-header,.home-header *{box-sizing:border-box}
+
+  /* ترتيب واجهة الهاتف: الأستاذ ← الشعار ← البحث ← فضاء التلميذ */
   .home-header .header-inner{
     position:relative;
     width:100%;
     max-width:100%;
     display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
+    flex-direction:column;
+    flex-wrap:nowrap;
+    align-items:stretch;
+    justify-content:flex-start;
+    gap:12px;
+    padding:10px 12px 16px;
   }
+
   .home-header .student-space,
   .home-header .teacher-space,
   .home-header .search-wrap{
@@ -30,11 +35,63 @@
     top:auto!important;
     margin:0!important;
   }
-  .home-header .search-wrap{order:1}
-  .home-header .teacher-space{order:2}
-  .home-header .student-space{order:3}
-  .home-header .logo-brand{order:0;flex:0 0 100%;text-align:center}
-  .home-header .brand-logo{max-width:100%;height:auto}
+
+  .home-header .teacher-space{
+    order:0;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:44px;
+    padding:10px 14px;
+  }
+
+  .home-header .logo-brand{
+    order:1;
+    width:100%;
+    flex:0 0 auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:2px 0 4px;
+  }
+
+  .home-header .brand-logo{
+    display:block;
+    width:auto;
+    max-width:min(82%,320px);
+    height:auto;
+    max-height:150px;
+    object-fit:contain;
+  }
+
+  .home-header .search-wrap{
+    order:2;
+    width:100%;
+    display:block;
+  }
+
+  .home-header .search-pill{
+    width:100%;
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+
+  .home-header .student-space{
+    order:3;
+    width:100%;
+    min-height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:13px 16px;
+  }
+
   .hero-home,.features,.axes-section,.closing-card{
     width:100%;
     max-width:100%;
