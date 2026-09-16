@@ -103,6 +103,11 @@
 </style>
 
 <style id="homepage-fixes">
+.search-icon{
+  font-size:22px;
+  font-weight:700;
+  line-height:1;
+}
 .search-results mark{
   font-weight:800;
   padding:0 .12em;
@@ -127,7 +132,7 @@
     </a>
     <div class="search-wrap">
       <button class="search-pill" id="openSearch" type="button" aria-label="البحث في المحتوى">
-        <span class="search-icon">⌕</span><span>ابحث في الموقع</span>
+        <span class="search-icon">🔍</span><span>ابحث في الموقع</span>
       </button>
     </div>
     <div class="laurel-brand logo-brand" aria-label="الأدب العربي في البكالوريا">
@@ -254,19 +259,35 @@
   }
 
   // فهرس داخلي قابل للعمل مع ملف index.html مستقل، مع الاحتفاظ بالمحاور الحالية.
-  const index=[
-    ...[...document.querySelectorAll('.axis-card')].map(card=>({
+  let index=[];
+
+fetch('search-index.json')
+  .then(r=>r.json())
+  .then(data=>{
+
+    const axes=[
+      ...document.querySelectorAll('.axis-card')
+    ].map(card=>({
       kind:'محور',
-      title:card.dataset.axis || card.querySelector('h3')?.textContent || '',
+      title:card.dataset.axis || '',
       text:(card.dataset.search||'')+' '+(card.querySelector('.axis-body')?.innerText||''),
       url:card.querySelector('a')?.getAttribute('href')||'#'
-    })),
-    {kind:'درس',title:'الدروس',text:'دروس الأدب العربي في البكالوريا فهم النص وتحليل الأدب والمحاور',url:'student__index.html'},
-    {kind:'تدريب',title:'التدريبات',text:'تدريبات تفاعلية في الأدب العربي والحجاج والتحليل والتأليف والمقال الجدلي',url:'student__index.html'},
-    {kind:'بحث',title:'البحوث',text:'بحوث أدبية ودراسات حول الأدب العربي والمحاور المقررة',url:'student__index.html'}
-  ];
+    }));
+
+    index=[
+      ...axes,
+      ...data
+    ];
+  })
+  .catch(err=>{
+    console.error('Search index error:',err);
+  });
 
   function render(q=''){
+    if(!index.length){
+      results.innerHTML='<div class="search-empty">جارٍ تحميل فهرس البحث...</div>';
+      return;
+    }
     if(!q.trim()){
       results.innerHTML='<div class="search-empty">اكتب كلمة أو عبارة للبحث في الدروس والتدريبات والبحوث والمحاور.</div>';
       return;
@@ -289,6 +310,12 @@
     modal.hidden=false;
     document.body.classList.add('modal-open');
     setTimeout(()=>input.focus(),50);
+
+    if(!index.length){
+      results.innerHTML='<div class="search-empty">جارٍ تحميل فهرس البحث...</div>';
+      return;
+    }
+
     render(input.value);
   }
   function close(){modal.hidden=true;document.body.classList.remove('modal-open');}
